@@ -1,4 +1,7 @@
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { doc, getDoc } from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 // Icons
 import { FaEyeSlash } from "react-icons/fa6";
@@ -6,7 +9,38 @@ import { FaEyeSlash } from "react-icons/fa6";
 // Assets
 import background from "../assets/bg.png";
 
+// Firebase
+import { auth, db } from "../firebase";
+
+// Utils
+import { isValidEmail } from "../utils/util";
+
 const Login = () => {
+  const navigate = useNavigate();
+  const { handleSubmit, register } = useForm();
+
+  const validateEmail = (email) => {
+    if (isValidEmail(email)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const onSubmit = (data) => {
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((user) => {
+        getDoc(doc(db, "Users", user.user.uid)).then((doc) => {
+          if (doc.data().category === "contributor") navigate("/contributor");
+          if (doc.data().category === "validator") navigate("/validator");
+          if (doc.data().category === "admin") navigate("/admin/users");
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="w-full h-[100vh] relative flex items-center justify-around">
       <img
@@ -63,16 +97,21 @@ const Login = () => {
           </p>
           <p className="text-black text-base">Please Enter your details</p>
         </div>
-        <form action="#" className="flex flex-col w-full items-center">
+        <form
+          className="flex flex-col w-full items-center"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <input
-            type="text"
+            type="email"
             placeholder="Email"
+            {...register("email", { required: true, validate: validateEmail })}
             className="w-1/2 h-14 pl-4 rounded bg-gray mb-6"
           />
           <div className="flex w-1/2 h-14 items-center relative mb-6">
             <input
               type="password"
               placeholder="Password"
+              {...register("password", { required: true })}
               className="w-full h-full pl-4 bg-gray rounded"
             />
             <FaEyeSlash className="absolute right-6 cursor-pointer text-xl" />

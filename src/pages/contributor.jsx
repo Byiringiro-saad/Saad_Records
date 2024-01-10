@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 // Components
-import Layout from "../components/layout";
 import Audio from "../components/audio";
+import Layout from "../components/layout";
 import Record from "../components/record";
 
 const Contributor = () => {

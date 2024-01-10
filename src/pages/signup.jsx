@@ -1,11 +1,49 @@
+import { doc, setDoc } from "firebase/firestore";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 // Assets
 import { FaEyeSlash } from "react-icons/fa6";
 
 // Assets
 import background from "../assets/bg.png";
-import { Link } from "react-router-dom";
+
+// Utils
+import { isValidEmail } from "../utils/util";
+
+// Firebase
+import { auth, db } from "../firebase";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm();
+
+  const validateEmail = (email) => {
+    if (isValidEmail(email)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const onSubmit = (data) => {
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then((cred) => {
+        setDoc(doc(db, "Users", cred.user.uid), {
+          email: data?.email,
+          gender: data?.gender,
+          dob: data?.dob,
+          category: data?.category,
+        }).then(() => {
+          navigate("/");
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="w-full h-[100vh] relative flex items-center justify-around">
       <img
@@ -20,16 +58,24 @@ const Signup = () => {
           </p>
           <p className="text-black text-base">Please Enter your details</p>
         </div>
-        <form action="#" className="w-1/2 h-auto flex flex-col items-center">
+        <form
+          className="w-1/2 h-auto flex flex-col items-center"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="flex w-full h-14 items-center mb-6">
             <input
               type="email"
               placeholder="Email"
+              {...register("email", {
+                required: true,
+                validate: validateEmail,
+              })}
               className="flex w-1/2 h-full rounded px-4 bg-gray mr-4"
             />
             <select
               name="Gender"
               id="Gender"
+              {...register("gender", { required: true })}
               className="flex w-1/2 h-full rounded px-4 bg-gray"
             >
               <option value="Male">Male</option>
@@ -41,11 +87,13 @@ const Signup = () => {
             <input
               type="date"
               placeholder="Date of Birth"
+              {...register("dob", { required: true })}
               className="flex w-1/2 h-full rounded px-4 bg-gray mr-4"
             />
             <select
               name="Category"
               id="categort"
+              {...register("category", { required: true })}
               className="flex w-1/2 h-full rounded px-4 bg-gray"
             >
               <option value="contributor">Contributor</option>
@@ -58,6 +106,7 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="Password"
+                {...register("password", { required: true })}
                 className="w-full h-full pl-4 bg-gray rounded"
               />
               <FaEyeSlash className="absolute right-6 cursor-pointer text-xl" />
@@ -66,6 +115,7 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="Confirm Password"
+                {...register("confirmPassword", { required: true })}
                 className="w-full h-full pl-4 bg-gray rounded"
               />
               <FaEyeSlash className="absolute right-6 cursor-pointer text-xl" />
