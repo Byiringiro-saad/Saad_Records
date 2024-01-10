@@ -1,13 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ReactMic } from "react-mic";
-import { useEffect, useRef, useState } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
+import { useEffect, useRef, useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 // Icons
 import { IoClose } from "react-icons/io5";
 import { VscMicFilled } from "react-icons/vsc";
-import { FaStop, FaPlay, FaPause } from "react-icons/fa";
 import { BsFillSendArrowUpFill } from "react-icons/bs";
+import { FaStop, FaPlay, FaPause } from "react-icons/fa";
+
+// Firebase
+import { auth, db } from "../firebase";
 
 const Record = () => {
   // show states
@@ -18,6 +24,12 @@ const Record = () => {
   // action states
   const [timer, setTimer] = useState(0);
   const [playing, setPlaying] = useState(false);
+
+  // current user
+  const [user] = useAuthState(auth);
+
+  // firebase storege
+  const storage = getStorage();
 
   const wavesRef = useRef(null);
 
@@ -68,7 +80,29 @@ const Record = () => {
     setRecordedAudio(null);
   };
 
-  const sendAudio = () => {};
+  const sendAudio = () => {
+    // convert blob to file
+    const file = new File([recordedAudio.blob], "audio.webm", {
+      type: "audio/webm",
+    });
+
+    const storageRef = ref(storage, "Audios/" + user.uid + "/" + file.name);
+
+    // upload file
+    uploadBytes(storageRef, file)
+      .then((snapshot) => {
+        // firebase firestore
+        addDoc(collection(db, "Audios"), {
+          name: snapshot.metadata.name,
+          url: snapshot.metadata.fullPath,
+        }).then(() => {
+          closeAudio();
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const togglePlaying = () => {
     wavesurfer.playPause();
