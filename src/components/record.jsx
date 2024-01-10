@@ -82,8 +82,8 @@ const Record = () => {
 
   const sendAudio = () => {
     // convert blob to file
-    const file = new File([recordedAudio.blob], "audio.webm", {
-      type: "audio/webm",
+    const file = new File([recordedAudio.blob], "audio.wav", {
+      type: "audio/wav",
     });
 
     const storageRef = ref(storage, "Audios/" + user.uid + "/" + file.name);
@@ -95,6 +95,7 @@ const Record = () => {
         addDoc(collection(db, "Audios"), {
           name: snapshot.metadata.name,
           url: snapshot.metadata.fullPath,
+          validated: false,
         }).then(() => {
           closeAudio();
         });
@@ -111,6 +112,7 @@ const Record = () => {
 
   const onStop = (recordedBlob) => {
     setRecordedAudio(recordedBlob);
+    console.log("recordedBlob is: ", recordedBlob);
   };
 
   return (

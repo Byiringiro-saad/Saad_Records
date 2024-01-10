@@ -1,26 +1,21 @@
+import { collection, getDocs, query } from "firebase/firestore";
 import { Fragment, useState } from "react";
+import { useQuery } from "react-query";
+import { db } from "../../firebase";
 
 const Users = () => {
-  const [users, setUsers] = useState([
-    {
-      email: "John Doe",
-      gender: "male",
-      dateofBirth: "12/12/2021",
-      category: "Contributor",
-    },
-    {
-      email: "John Doe",
-      gender: "male",
-      dateofBirth: "12/12/2021",
-      category: "Contributor",
-    },
-    {
-      email: "John Doe",
-      gender: "male",
-      dateofBirth: "12/12/2021",
-      category: "Contributor",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+
+  useQuery("users", () => {
+    const q = query(collection(db, "Users"));
+    getDocs(q).then((querySnapshot) => {
+      let users = [];
+      querySnapshot.forEach((doc) => {
+        users.push(doc.data());
+      });
+      setUsers(users);
+    });
+  });
 
   return (
     <Fragment>
@@ -46,7 +41,7 @@ const Users = () => {
             <tr className="border-b border-b-grayish text-black">
               <td className="px-6 py-4">{user.email}</td>
               <td className="px-6 py-4">{user.gender}</td>
-              <td className="px-6 py-4">{user.dateofBirth}</td>
+              <td className="px-6 py-4">{user.dob}</td>
               <td className="px-6 py-4">{user.category}</td>
             </tr>
           ))}
