@@ -2,9 +2,9 @@
 import { ReactMic } from "react-mic";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
-import { addDoc, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 // Icons
 import { IoClose } from "react-icons/io5";
@@ -80,29 +80,36 @@ const Record = () => {
     setRecordedAudio(null);
   };
 
-  const sendAudio = () => {
+  const sendAudio = async () => {
     // convert blob to file
     const file = new File([recordedAudio.blob], "audio.wav", {
       type: "audio/wav",
     });
 
-    const storageRef = ref(storage, "Audios/" + user.uid + "/" + file.name);
+    const storageRef = ref(
+      storage,
+      `Audios/${user.uid}/${Date.now()}_${file.name}`
+    );
 
-    // upload file
-    uploadBytes(storageRef, file)
-      .then((snapshot) => {
-        // firebase firestore
-        addDoc(collection(db, "Audios"), {
-          name: snapshot.metadata.name,
-          url: snapshot.metadata.fullPath,
-          validated: false,
-        }).then(() => {
-          closeAudio();
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    try {
+      // upload file
+      const snapshot = await uploadBytes(storageRef, file);
+
+      // firebase firestore
+      const audioDocRef = doc(collection(db, "Audios"));
+
+      await setDoc(audioDocRef, {
+        name: snapshot.metadata.name,
+        url: snapshot.metadata.fullPath,
+        contributor: user.uid,
+        validated: null,
+        timestamp: serverTimestamp(),
       });
+
+      closeAudio();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const togglePlaying = () => {

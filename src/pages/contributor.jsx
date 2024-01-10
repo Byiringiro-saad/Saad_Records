@@ -1,12 +1,34 @@
 import { useState } from "react";
+import { useQuery } from "react-query";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 // Components
 import Audio from "../components/audio";
 import Layout from "../components/layout";
 import Record from "../components/record";
 
+// Firebase
+import { auth, db } from "../firebase";
+
 const Contributor = () => {
+  const [user] = useAuthState(auth);
   const [audios, setAudios] = useState([]);
+
+  useQuery("audios-validator", () => {
+    const q = query(
+      collection(db, "Audios"),
+      where("validated", "==", true),
+      where("contributor", "==", user.uid)
+    );
+    getDocs(q).then((querySnapshot) => {
+      let audios = [];
+      querySnapshot.forEach((doc) => {
+        audios.push({ ...doc.data(), id: doc.id });
+      });
+      setAudios(audios);
+    });
+  });
 
   return (
     <Layout>

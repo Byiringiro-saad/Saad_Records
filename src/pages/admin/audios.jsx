@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "react-query";
+import { collection, getDocs, query } from "firebase/firestore";
 
 // Components
 import Audio from "../../components/audio";
@@ -6,8 +8,8 @@ import Audio from "../../components/audio";
 // Icons
 import { MdVerified } from "react-icons/md";
 import { AiOutlineStop } from "react-icons/ai";
-import { useQuery } from "react-query";
-import { collection, getDocs, query } from "firebase/firestore";
+
+// Firebase
 import { db } from "../../firebase";
 
 const Audios = () => {
@@ -30,14 +32,19 @@ const Audios = () => {
         return (
           <div className="flex h-14 w-auto items-center bg-gray rounded">
             <Audio key={index} audio={audio} />
-            {audio?.validated && (
+            {audio?.validated === true && (
               <div className="flex w-[15%] h-[70%] items-center justify-center">
                 <MdVerified className="text-pink text-xl cursor-pointer" />
               </div>
             )}
-            {!audio?.validated && (
+            {audio?.validated === false && (
               <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-grayish">
                 <AiOutlineStop className="text-black text-xl cursor-pointer" />
+              </div>
+            )}
+            {audio?.validated === null && (
+              <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-grayish">
+                <p>...</p>
               </div>
             )}
           </div>

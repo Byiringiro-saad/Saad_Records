@@ -1,22 +1,14 @@
 // Icons
 import { FaPlay } from "react-icons/fa";
-import { useRef, useState } from "react";
+
+import { useRef } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 const Audio = ({ audio }) => {
-  const [url, setUrl] = useState(null);
-
-  const storage = getStorage();
   const wavesRef = useRef(null);
-
-  getDownloadURL(ref(storage, audio.url)).then((newUrl) => {
-    setUrl(newUrl);
-  });
 
   const { wavesurfer } = useWavesurfer({
     container: wavesRef,
-    url: `${url}`,
     waveColor: "#FFFFFF",
     progressColor: "#101010",
     cursorColor: "#FD6662",

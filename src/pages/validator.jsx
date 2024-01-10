@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 // Components
 import Audio from "../components/audio";
@@ -16,16 +23,26 @@ import { db } from "../firebase";
 const Validator = () => {
   const [audios, setAudios] = useState([]);
 
-  const approveAudio = () => {};
+  const approveAudio = async (id) => {
+    const audioRef = doc(collection(db, "Audios"), id);
+    await updateDoc(audioRef, {
+      validated: true,
+    });
+  };
 
-  const rejectAudio = () => {};
+  const rejectAudio = (id) => {
+    const audioRef = doc(collection(db, "Audios"), id);
+    updateDoc(audioRef, {
+      validated: false,
+    });
+  };
 
   useQuery("audios-validator", () => {
-    const q = query(collection(db, "Audios"), where("validated", "==", false));
+    const q = query(collection(db, "Audios"), where("validated", "==", null));
     getDocs(q).then((querySnapshot) => {
       let audios = [];
       querySnapshot.forEach((doc) => {
-        audios.push(doc.data());
+        audios.push({ ...doc.data(), id: doc.id });
       });
       setAudios(audios);
     });
@@ -44,13 +61,13 @@ const Validator = () => {
               <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-grayish">
                 <MdDone
                   className="text-black text-xl cursor-pointer"
-                  onClick={approveAudio}
+                  onClick={() => approveAudio(audios[index].id)}
                 />
               </div>
               <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-grayish">
                 <IoClose
                   className="text-black text-xl cursor-pointer"
-                  onClick={rejectAudio}
+                  onClick={() => rejectAudio(audios[index].id)}
                 />
               </div>
             </div>
