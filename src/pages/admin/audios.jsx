@@ -27,10 +27,10 @@ const Audios = () => {
   });
 
   return (
-    <div className="w-full h-auto grid grid-cols-3 gap-6 items-cente pt-4">
+    <div className="w-full h-auto grid grid-cols-2 gap-6 items-cente pt-4">
       {audios.map((audio, index) => {
         return (
-          <div className="flex h-14 w-auto items-center bg-gray rounded">
+          <div className="flex h-14 w-auto items-center justify-between bg-gray rounded">
             <Audio key={index} audio={audio} />
             {audio?.validated === true && (
               <div className="flex w-[15%] h-[70%] items-center justify-center">
@@ -51,7 +51,7 @@ const Audios = () => {
         );
       })}
       {audios?.length === 0 && (
-        <p className="text-base text-grayish col-start-2 text-center mt-10">
+        <p className="text-base text-grayish col-span-2 text-center mt-10">
           No audios audios
         </p>
       )}
