@@ -12,7 +12,6 @@ import Validator from "./pages/validator";
 import Contributor from "./pages/contributor";
 
 // Global styles
-import "react-h5-audio-player/lib/styles.css";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
