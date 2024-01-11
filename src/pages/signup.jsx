@@ -31,6 +31,7 @@ const Signup = () => {
   };
 
   const onSubmit = (data) => {
+    setLoading(true);
     createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((cred) => {
         setDoc(doc(db, "Users", cred.user.uid), {
@@ -44,6 +45,9 @@ const Signup = () => {
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
