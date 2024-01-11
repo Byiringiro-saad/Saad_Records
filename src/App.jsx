@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { ToastContainer } from "react-toastify";
 import { Routes, Route } from "react-router-dom";
 
@@ -11,8 +12,8 @@ import Validator from "./pages/validator";
 import Contributor from "./pages/contributor";
 
 // Global styles
+import "react-h5-audio-player/lib/styles.css";
 import "react-toastify/dist/ReactToastify.css";
-import { Fragment } from "react";
 
 function App() {
   return (
