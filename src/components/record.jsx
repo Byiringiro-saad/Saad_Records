@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 // Icons
@@ -29,9 +28,6 @@ const Record = () => {
 
   // current user
   const [user] = useAuthState(auth);
-
-  // firebase storege
-  const storage = getStorage();
 
   const wavesRef = useRef(null);
 
@@ -89,35 +85,38 @@ const Record = () => {
       type: "audio/wav",
     });
 
-    const storageRef = ref(
-      storage,
-      `Audios/${user.uid}/${Date.now()}_${file.name}`
-    );
+    // create formData
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "t0l10mfh");
 
-    try {
-      // upload file
-      const snapshot = await uploadBytes(storageRef, file);
-
-      // firebase firestore
-      const audioDocRef = doc(collection(db, "Audios"));
-
-      await setDoc(audioDocRef, {
-        name: snapshot.metadata.name,
-        url: snapshot.metadata.fullPath,
-        contributor: user.uid,
-        validated: null,
-        timestamp: serverTimestamp(),
-      })
-        .then(() => {
-          toast.success("Audio uploaded, wait for approval");
-          closeAudio();
+    // upload file to cloudinary
+    fetch("https://api.cloudinary.com/v1_1/f-studios/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
+        // firebase firestore
+        const audioDocRef = doc(collection(db, "Audios"));
+        await setDoc(audioDocRef, {
+          name: data.original_filename,
+          url: data.secure_url,
+          contributor: user.uid,
+          validated: null,
+          timestamp: serverTimestamp(),
         })
-        .finally(() => {
-          setLoading(false);
-        });
-    } catch (error) {
-      console.error(error);
-    }
+          .then(() => {
+            toast.success("Audio uploaded, wait for approval");
+            closeAudio();
+          })
+          .catch((err) => {
+            toast.error("Something went wrong, try again");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      });
   };
 
   const togglePlaying = () => {

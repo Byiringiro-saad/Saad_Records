@@ -1,23 +1,18 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 // Icons
 import { FaPlay } from "react-icons/fa";
 
 const Audio = ({ audio }) => {
-  const [url, setUrl] = useState(null);
-
   const wavesRef = useRef(null);
-
-  const storage = getStorage();
-  getDownloadURL(ref(storage, audio?.url)).then((u) => setUrl(u));
 
   const { wavesurfer } = useWavesurfer({
     container: wavesRef,
-    waveColor: "#FFFFFF",
-    progressColor: "#101010",
-    cursorColor: "#FD6662",
+    url: audio?.url || null,
+    waveColor: "#101010",
+    progressColor: "#FD6662",
+    cursorColor: "#E6E6E6",
     height: 50,
   });
 
@@ -30,10 +25,7 @@ const Audio = ({ audio }) => {
       <div className="flex w-[15%] h-[70%] items-center justify-center border-r border-r-grayish ml-1">
         <FaPlay className="cursor-pointer" onClick={tooglePlaying} />
       </div>
-      <div
-        className="flex w-[80%] h-[70%] items-center justify-center border-r border-r-grayish"
-        ref={wavesRef}
-      />
+      <div className=" w-[200px] px-2" ref={wavesRef} />
     </div>
   );
 };
