@@ -157,10 +157,9 @@ const Signup = () => {
           </div>
           {
             <p className="text-red-500 text-sm mb-6 text-pink">
-              {errors?.password?.type === "required" && "Password is required"}
-              &nbsp;{" || "}
+              {errors?.password?.type === "required" && "Password is required "}
               {errors?.confirmPassword?.type === "required" &&
-                "Confirm Password is required"}
+                "|| Confirm Password is required"}
               {errors?.confirmPassword?.type === "validate" &&
                 "Passwords do not match"}
             </p>
