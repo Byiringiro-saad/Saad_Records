@@ -17,6 +17,7 @@ import { auth, db } from "../firebase";
 
 const Record = () => {
   // show states
+  const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
@@ -81,6 +82,7 @@ const Record = () => {
   };
 
   const sendAudio = async () => {
+    setLoading(true);
     // convert blob to file
     const file = new File([recordedAudio.blob], "audio.wav", {
       type: "audio/wav",
@@ -104,9 +106,13 @@ const Record = () => {
         contributor: user.uid,
         validated: null,
         timestamp: serverTimestamp(),
-      });
-
-      closeAudio();
+      })
+        .then(() => {
+          closeAudio();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       console.error(error);
     }
@@ -185,10 +191,16 @@ const Record = () => {
         </div>
         <div className="w-[250px] px-2" ref={wavesRef} />
         <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-white">
-          <BsFillSendArrowUpFill
-            className="text-white text-xl cursor-pointer"
-            onClick={sendAudio}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+            </div>
+          ) : (
+            <BsFillSendArrowUpFill
+              className="text-white text-xl cursor-pointer"
+              onClick={sendAudio}
+            />
+          )}
         </div>
         <div className="flex w-[15%] h-[70%] items-center justify-center border-l border-l-white">
           <IoClose
