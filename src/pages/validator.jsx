@@ -7,6 +7,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 // Components
 import Audio from "../components/audio";
@@ -23,21 +24,7 @@ import { db } from "../firebase";
 const Validator = () => {
   const [audios, setAudios] = useState([]);
 
-  const approveAudio = async (id) => {
-    const audioRef = doc(collection(db, "Audios"), id);
-    await updateDoc(audioRef, {
-      validated: true,
-    });
-  };
-
-  const rejectAudio = (id) => {
-    const audioRef = doc(collection(db, "Audios"), id);
-    updateDoc(audioRef, {
-      validated: false,
-    });
-  };
-
-  useQuery("audios-validator", () => {
+  const { refetch } = useQuery("audios-validator", () => {
     const q = query(collection(db, "Audios"), where("validated", "==", null));
     getDocs(q).then((querySnapshot) => {
       let audios = [];
@@ -47,6 +34,38 @@ const Validator = () => {
       setAudios(audios);
     });
   });
+
+  const approveAudio = async (id) => {
+    const audioRef = doc(collection(db, "Audios"), id);
+    await updateDoc(audioRef, {
+      validated: true,
+    })
+      .then(() => {
+        toast.success("Audio approved");
+      })
+      .catch((error) => {
+        toast.error("Something went wrong");
+      })
+      .finally(() => {
+        refetch();
+      });
+  };
+
+  const rejectAudio = (id) => {
+    const audioRef = doc(collection(db, "Audios"), id);
+    updateDoc(audioRef, {
+      validated: false,
+    })
+      .then(() => {
+        toast.success("Audio rejected");
+      })
+      .catch((error) => {
+        toast.error("Something went wrong");
+      })
+      .finally(() => {
+        refetch();
+      });
+  };
 
   return (
     <Layout>

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ReactMic } from "react-mic";
+import { toast } from "react-toastify";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -108,6 +109,7 @@ const Record = () => {
         timestamp: serverTimestamp(),
       })
         .then(() => {
+          toast.success("Audio uploaded, wait for approval");
           closeAudio();
         })
         .finally(() => {
