@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { doc, getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
@@ -45,7 +46,8 @@ const Login = () => {
         });
       })
       .catch((error) => {
-        console.log(error);
+        error.code === "auth/invalid-credential" &&
+          toast.error("Invalid credentials");
       })
       .finally(() => {
         setLoading(false);

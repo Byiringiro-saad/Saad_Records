@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 // Icons
@@ -5,7 +6,6 @@ import { MdOutlineLogout } from "react-icons/md";
 
 // Firebase
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();

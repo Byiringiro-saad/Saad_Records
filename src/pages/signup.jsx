@@ -4,7 +4,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
-// Assets
+// Icons
 import { FaEyeSlash } from "react-icons/fa6";
 
 // Assets
@@ -15,6 +15,7 @@ import { isValidEmail } from "../utils/util";
 
 // Firebase
 import { auth, db } from "../firebase";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
@@ -57,7 +58,8 @@ const Signup = () => {
         });
       })
       .catch((error) => {
-        console.log(error);
+        error.code === "auth/email-already-in-use" &&
+          toast.error("Email address already in use");
       })
       .finally(() => {
         setLoading(false);
@@ -169,8 +171,8 @@ const Signup = () => {
             className="w-1/2 h-14 bg-pink rounded text-white"
           >
             {loading ? (
-              <div className="flex w-6 h-6 justify-center items-center">
-                <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
               </div>
             ) : (
               "Signup"

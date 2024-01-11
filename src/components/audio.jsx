@@ -1,8 +1,8 @@
-// Icons
-import { FaPlay } from "react-icons/fa";
-
 import { useRef } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
+
+// Icons
+import { FaPlay } from "react-icons/fa";
 
 const Audio = ({ audio }) => {
   const wavesRef = useRef(null);
