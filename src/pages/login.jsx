@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { doc, getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +17,8 @@ import { auth, db } from "../firebase";
 import { isValidEmail } from "../utils/util";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { handleSubmit, register } = useForm();
 
@@ -28,6 +31,7 @@ const Login = () => {
   };
 
   const onSubmit = (data) => {
+    setLoading(true);
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((user) => {
         getDoc(doc(db, "Users", user.user.uid)).then((doc) => {
@@ -38,6 +42,9 @@ const Login = () => {
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -120,7 +127,13 @@ const Login = () => {
             type="submit"
             className="w-1/2 h-14 bg-pink rounded text-white"
           >
-            Login
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <div className="flex mt-20">

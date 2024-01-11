@@ -1,5 +1,6 @@
-import { doc, setDoc } from "firebase/firestore";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -16,6 +17,8 @@ import { isValidEmail } from "../utils/util";
 import { auth, db } from "../firebase";
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
 
@@ -125,7 +128,13 @@ const Signup = () => {
             type="submit"
             className="w-1/2 h-14 bg-pink rounded text-white"
           >
-            Signup
+            {loading ? (
+              <div className="flex w-6 h-6 justify-center items-center">
+                <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              "Signup"
+            )}
           </button>
         </form>
         <div className="flex mt-20">
