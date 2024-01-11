@@ -20,7 +20,11 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { handleSubmit, register } = useForm();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm();
 
   const validateEmail = (email) => {
     if (isValidEmail(email)) {
@@ -114,6 +118,12 @@ const Login = () => {
             {...register("email", { required: true, validate: validateEmail })}
             className="w-1/2 h-14 pl-4 rounded bg-gray mb-6"
           />
+          {errors.email?.type === "required" && (
+            <p className="text-red text-sm mb-6 text-pink">Email is required</p>
+          )}
+          {errors.email?.type === "validate" && (
+            <p className="text-red text-sm mb-6 text-pink">Invalid email</p>
+          )}
           <div className="flex w-1/2 h-14 items-center relative mb-6">
             <input
               type="password"
@@ -123,6 +133,11 @@ const Login = () => {
             />
             <FaEyeSlash className="absolute right-6 cursor-pointer text-xl" />
           </div>
+          {errors.password?.type === "required" && (
+            <p className="text-red text-sm mb-6 text-pink">
+              Password is required
+            </p>
+          )}
           <button
             type="submit"
             className="w-1/2 h-14 bg-pink rounded text-white"

@@ -20,10 +20,23 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = useForm();
 
   const validateEmail = (email) => {
     if (isValidEmail(email)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const comparePasswords = (password) => {
+    if (password === getValues("password")) {
       return true;
     } else {
       return false;
@@ -90,6 +103,12 @@ const Signup = () => {
               <option value="Other">Other</option>
             </select>
           </div>
+          {
+            <p className="text-red-500 text-sm mb-6 text-pink">
+              {errors?.email?.type === "required" && "Email is required"}
+              {errors?.email?.type === "validate" && "Email is not valid"}
+            </p>
+          }
           <div className="flex w-full h-14 items-center mb-6">
             <input
               type="date"
@@ -108,6 +127,11 @@ const Signup = () => {
               <option value="admin">Admin</option>
             </select>
           </div>
+          {
+            <p className="text-red-500 text-sm mb-6 text-pink">
+              {errors?.dob?.type === "required" && "Date of Birth is required"}
+            </p>
+          }
           <div className="flex w-full h-14 items-center mb-6">
             <div className="flex w-1/2 h-14 items-center relative mr-4">
               <input
@@ -122,12 +146,25 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="Confirm Password"
-                {...register("confirmPassword", { required: true })}
+                {...register("confirmPassword", {
+                  required: true,
+                  validate: comparePasswords,
+                })}
                 className="w-full h-full pl-4 bg-gray rounded"
               />
               <FaEyeSlash className="absolute right-6 cursor-pointer text-xl" />
             </div>
           </div>
+          {
+            <p className="text-red-500 text-sm mb-6 text-pink">
+              {errors?.password?.type === "required" && "Password is required"}
+              &nbsp;{" || "}
+              {errors?.confirmPassword?.type === "required" &&
+                "Confirm Password is required"}
+              {errors?.confirmPassword?.type === "validate" &&
+                "Passwords do not match"}
+            </p>
+          }
           <button
             type="submit"
             className="w-1/2 h-14 bg-pink rounded text-white"
